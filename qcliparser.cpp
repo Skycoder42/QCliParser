@@ -58,9 +58,9 @@ QCliParser::QCliParser() :
 void QCliParser::process(const QStringList &arguments)
 {
 	if(parse(arguments)) {
-		if(QCommandLineParser::isSet(QStringLiteral("--help")))
+		if(QCommandLineParser::isSet(QStringLiteral("help")))
 			showHelp(EXIT_SUCCESS);
-		if(QCommandLineParser::isSet(QStringLiteral("--version")))
+		if(QCommandLineParser::isSet(QStringLiteral("version")))
 			showVersion();
 	} else {
 		showParserMessage(errorText() + QLatin1Char('\n'));
@@ -143,8 +143,10 @@ void QCliParser::clearPositionalArguments()
 
 void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 {
-	if(context->_nodes.isEmpty())
-		throw tr("A QCliContext must have at least 1 node");
+	Q_ASSERT_X(!context->_nodes.isEmpty(),
+			   Q_FUNC_INFO,
+			   qPrintable(QStringLiteral("A QCliContext must have at least 1 node. At chain: %1")
+						  .arg(_contextChain.join(QStringLiteral("->")))));
 
 	// reset args + add options
 	QCommandLineParser::clearPositionalArguments();
@@ -152,27 +154,36 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 
 	//create positional args
 	auto commands = context->_nodes.keys();
-	auto firstName = commands.takeFirst();
+	auto firstName = commands.first();
 	QCommandLineParser::addPositionalArgument(firstName, context->_nodes.value(firstName).first, firstName);
-	foreach(auto name, commands)
+	for(auto i = 1; i < commands.size(); i++) {
+		const auto &name = commands[i];
 		QCommandLineParser::addPositionalArgument(name, context->_nodes.value(name).first, QStringLiteral("| %1").arg(name));
+	}
 
-	// parse . if no errors and help/version -> done
+	// parse . if no errors and version -> done
 	if(QCommandLineParser::parse(arguments) &&
-	   (QCommandLineParser::isSet(QStringLiteral("--version")) ||
-		QCommandLineParser::isSet(QStringLiteral("--help"))))
+	   QCommandLineParser::isSet(QStringLiteral("version")))
 		return;
 	//ignore errors, only treated on leafs
 
 	//determine the selected command
 	auto pArgs = QCommandLineParser::positionalArguments();
 	auto cIndex = -1;
-	if(!pArgs.isEmpty())
+	if(!pArgs.isEmpty()) {
 		cIndex = commands.indexOf(pArgs.first());
-	if(cIndex == -1)
+		if(cIndex == -1)
+			throw tr("Unknown command \"%1\"").arg(pArgs.first());
+	} else {
 		cIndex = commands.indexOf(context->_defaultNode);
-	if(cIndex == -1)
-		throw tr("Arguments do not contain a valid command");
+		if(cIndex == -1) {
+			//help -> no next command means help for this command
+			if(QCommandLineParser::isSet(QStringLiteral("help")))
+				return;
+			else
+				throw tr("A command must be specified");
+		}
+	}
 
 	// get the next node and it's type
 	auto nextContext = commands[cIndex];

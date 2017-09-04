@@ -60,6 +60,24 @@ bool QCliContext::addCliNode(const QString &name, const QString &description, co
 	}
 }
 
+QSharedPointer<QCliContext> QCliContext::addContextNode(const QString &name, const QString &description)
+{
+	auto ptr = QSharedPointer<QCliContext>::create();
+	if(addCliNode(name, description, ptr))
+		return ptr;
+	else
+		return {};
+}
+
+QSharedPointer<QCliLeaf> QCliContext::addLeafNode(const QString &name, const QString &description)
+{
+	auto ptr = QSharedPointer<QCliLeaf>::create();
+	if(addCliNode(name, description, ptr))
+		return ptr;
+	else
+		return {};
+}
+
 void QCliContext::setDefaultNode(const QString &name)
 {
 	_defaultNode = name;

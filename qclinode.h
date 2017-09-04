@@ -41,8 +41,8 @@ public:
 	QCliContext();
 
 	bool addCliNode(const QString &name, const QString &description, const QSharedPointer<QCliNode> &node);
-	template <typename TNode>
-	QSharedPointer<TNode> addCliNode(const QString &name, const QString &description);
+	QSharedPointer<QCliContext> addContextNode(const QString &name, const QString &description);
+	QSharedPointer<QCliLeaf> addLeafNode(const QString &name, const QString &description);
 	void setDefaultNode(const QString &name);
 
 	template <typename TNode = QCliNode>
@@ -54,16 +54,6 @@ private:
 };
 
 // ------------- GENERIC IMPLEMENTATION -------------
-
-template<typename TNode>
-QSharedPointer<TNode> QCliContext::addCliNode(const QString &name, const QString &description)
-{
-	auto node = QSharedPointer<TNode>::create();
-	if(addCliNode(name, description, node))
-		return node;
-	else
-		return {};
-}
 
 template<typename TNode>
 QSharedPointer<TNode> QCliContext::getNode(const QString &name) const
