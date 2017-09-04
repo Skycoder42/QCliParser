@@ -155,10 +155,15 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 	//create positional args
 	auto commands = context->_nodes.keys();
 	auto firstName = commands.first();
-	QCommandLineParser::addPositionalArgument(firstName, context->_nodes.value(firstName).first, firstName);
+	QCommandLineParser::addPositionalArgument(firstName,
+											  context->_nodes.value(firstName).first,
+											  QStringLiteral("%1%2%3")
+											  .arg(_contextChain.join(QLatin1Char(' ')))
+											  .arg(_contextChain.isEmpty() ? QString() : QStringLiteral(" "))
+											  .arg(commands.join(QLatin1Char('|'))));
 	for(auto i = 1; i < commands.size(); i++) {
 		const auto &name = commands[i];
-		QCommandLineParser::addPositionalArgument(name, context->_nodes.value(name).first, QStringLiteral("| %1").arg(name));
+		QCommandLineParser::addPositionalArgument(name, context->_nodes.value(name).first, QStringLiteral(" \b"));
 	}
 
 	// parse . if no errors and version -> done
@@ -205,8 +210,20 @@ void QCliParser::parseLeaf(QCliLeaf *leaf, const QStringList &arguments)
 	QCommandLineParser::clearPositionalArguments();
 	QCommandLineParser::addOptions(leaf->_options);
 
-	foreach(auto pArg, leaf->_arguments)
-		QCommandLineParser::addPositionalArgument(std::get<0>(pArg), std::get<1>(pArg), std::get<2>(pArg));
+	if(leaf->_arguments.isEmpty())
+		QCommandLineParser::addPositionalArgument(QStringLiteral(" "), QStringLiteral(" "), _contextChain.join(QLatin1Char(' ')));
+	else {
+		auto first = leaf->_arguments.first();
+		QCommandLineParser::addPositionalArgument(std::get<0>(first),
+												  std::get<1>(first),
+												  QStringLiteral("%1 %2")
+												  .arg(_contextChain.join(QLatin1Char(' ')))
+												  .arg(std::get<2>(first)));
+		for(auto i = 1; i < leaf->_arguments.size(); i++) {
+			const auto &pArg = leaf->_arguments[i];
+			QCommandLineParser::addPositionalArgument(std::get<0>(pArg), std::get<1>(pArg), std::get<2>(pArg));
+		}
+	}
 
 	//parse completly now, must be valid!
 	if(!QCommandLineParser::parse(arguments))
