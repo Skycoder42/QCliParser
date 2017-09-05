@@ -1,4 +1,5 @@
 #include "qcliparser.h"
+#include <QDebug>
 #if defined(Q_OS_WIN) && !defined(QT_BOOTSTRAPPED) && !defined(Q_OS_WINRT)
 #  include <qt_windows.h>
 #endif
@@ -77,14 +78,22 @@ void QCliParser::process(const QCoreApplication &app)
 
 bool QCliParser::parse(const QStringList &arguments)
 {
+	if(_readContextIndex != -1) {
+		qWarning() << "Parser is currently in context scope. "
+					  "Parsing different arguments then before can lead to undefined behaviour!";
+	}
 	_errorText.clear();
 	try {
 		parseContext(this, arguments);
 		return true;
 	} catch (QString &string) {
-		_errorText = tr("%1\nError-Context: %2")
-					 .arg(string)
-					 .arg(_contextChain.join(QStringLiteral("->")));
+		if(_contextChain.isEmpty())
+			_errorText = string;
+		else {
+			_errorText = tr("%1\nCommand-Context: %2")
+						 .arg(string)
+						 .arg(_contextChain.join(QStringLiteral(" -> ")));
+		}
 		return false;
 	}
 }
@@ -112,10 +121,13 @@ QString QCliParser::currentContext() const
 		return _contextChain[_readContextIndex];
 }
 
-void QCliParser::leaveContext()
+bool QCliParser::leaveContext()
 {
-	if(_readContextIndex >= 0)
+	if(_readContextIndex >= 0) {
 		_readContextIndex--;
+		return true;
+	} else
+		return false;
 }
 
 QStringList QCliParser::contextChain() const

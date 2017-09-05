@@ -20,7 +20,7 @@ public:
 
 	bool enterContext(const QString &name);
 	QString currentContext() const;
-	void leaveContext();
+	bool leaveContext();
 
 	QStringList contextChain() const;
 	QString errorText() const;
