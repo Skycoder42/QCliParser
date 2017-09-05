@@ -78,10 +78,12 @@ void QCliParser::process(const QCoreApplication &app)
 
 bool QCliParser::parse(const QStringList &arguments)
 {
+#ifndef QT_NO_DEBUG
 	if(_readContextIndex != -1) {
 		qWarning() << "Parser is currently in context scope. "
 					  "Parsing different arguments then before can lead to undefined behaviour!";
 	}
+#endif
 	_errorText.clear();
 	try {
 		parseContext(this, arguments);
