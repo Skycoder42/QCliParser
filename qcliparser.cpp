@@ -167,15 +167,21 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 	//create positional args
 	auto commands = context->_nodes.keys();
 	auto firstName = commands.first();
-	QCommandLineParser::addPositionalArgument(firstName,
+	auto pFirstName = firstName;
+	if(firstName == context->_defaultNode)
+		pFirstName = tr("%1 (default)").arg(firstName);
+	QCommandLineParser::addPositionalArgument(pFirstName,
 											  context->_nodes.value(firstName).first,
-											  QStringLiteral("%1%2%3")
+											  (context->_defaultNode.isNull() ? QStringLiteral("%1%2%3") : QStringLiteral("%1%2[%3]"))
 											  .arg(_contextChain.join(QLatin1Char(' ')))
 											  .arg(_contextChain.isEmpty() ? QString() : QStringLiteral(" "))
 											  .arg(commands.join(QLatin1Char('|'))));
 	for(auto i = 1; i < commands.size(); i++) {
-		const auto &name = commands[i];
-		QCommandLineParser::addPositionalArgument(name, context->_nodes.value(name).first, QStringLiteral(" \b"));
+		auto name = commands[i];
+		auto pName = name;
+		if(name == context->_defaultNode)
+			pName = tr("%1 (default)").arg(name);
+		QCommandLineParser::addPositionalArgument(pName, context->_nodes.value(name).first, QStringLiteral(" \b"));
 	}
 
 	// parse . if no errors and version -> done
@@ -192,14 +198,11 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 		if(cIndex == -1)
 			throw tr("Unknown command \"%1\"").arg(pArgs.first());
 	} else {
+		if(QCommandLineParser::isSet(QStringLiteral("help")))
+			return;
 		cIndex = commands.indexOf(context->_defaultNode);
-		if(cIndex == -1) {
-			//help -> no next command means help for this command
-			if(QCommandLineParser::isSet(QStringLiteral("help")))
-				return;
-			else
-				throw tr("A command must be specified");
-		}
+		if(cIndex == -1)
+			throw tr("A command must be specified");
 	}
 
 	// get the next node and it's type

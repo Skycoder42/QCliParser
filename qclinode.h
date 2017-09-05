@@ -2,6 +2,7 @@
 #define QCLINODE_H
 
 #include <QCommandLineOption>
+#include <QMap>
 #include <QSet>
 #include <QSharedPointer>
 
@@ -49,7 +50,7 @@ public:
 	QSharedPointer<TNode> getNode(const QString &name) const;
 
 private:
-	QHash<QString, QPair<QString, QSharedPointer<QCliNode>>> _nodes;
+	QMap<QString, QPair<QString, QSharedPointer<QCliNode>>> _nodes;//TODO keep the add order!
 	QString _defaultNode;
 };
 

@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 
 	messageNode->addLeafNode(QStringLiteral("random"), QStringLiteral("Print some random stuff"));
 	messageNode->addLeafNode(QStringLiteral("help"), QStringLiteral("print the full help information, not just the selective one"));
+	messageNode->setDefaultNode(QStringLiteral("random"));
 
 	parser.process(a);
 
