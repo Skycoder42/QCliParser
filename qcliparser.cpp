@@ -56,7 +56,7 @@ QCliParser::QCliParser() :
 	_readContextIndex(-1)
 {}
 
-void QCliParser::process(const QStringList &arguments)
+void QCliParser::process(const QStringList &arguments, bool colored)
 {
 	if(parse(arguments)) {
 		if(QCommandLineParser::isSet(QStringLiteral("help")))
@@ -64,16 +64,23 @@ void QCliParser::process(const QStringList &arguments)
 		if(QCommandLineParser::isSet(QStringLiteral("version")))
 			showVersion();
 	} else {
-		showParserMessage(errorText() + QLatin1Char('\n'));
+#ifndef Q_OS_WIN
+		if(colored)
+			showParserMessage(QStringLiteral("\033[31m") + errorText() + QStringLiteral("\033[0m\n"));
+		else
+#else
+		Q_UNUSED(colored)
+#endif
+			showParserMessage(errorText() + QLatin1Char('\n'));
 		qt_call_post_routines();
 		::exit(EXIT_FAILURE);
 	}
 }
 
-void QCliParser::process(const QCoreApplication &app)
+void QCliParser::process(const QCoreApplication &app, bool colored)
 {
 	Q_UNUSED(app)
-	process(QCoreApplication::arguments());
+	process(QCoreApplication::arguments(), colored);
 }
 
 bool QCliParser::parse(const QStringList &arguments)

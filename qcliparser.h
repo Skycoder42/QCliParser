@@ -14,8 +14,8 @@ public:
 	using QCliContext::addOption;
 	using QCliContext::addOptions;
 
-	void process(const QStringList &arguments);
-	void process(const QCoreApplication &app);
+	void process(const QStringList &arguments, bool colored = false);
+	void process(const QCoreApplication &app, bool colored = false);
 	bool parse(const QStringList &arguments);
 
 	bool enterContext(const QString &name);
