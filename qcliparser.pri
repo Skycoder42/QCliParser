@@ -6,6 +6,6 @@ SOURCES += \
 	$$PWD/qcliparser.cpp \
 	$$PWD/qclinode.cpp
 
-LIBS += -luser32
+win32: LIBS += -luser32
 
 INCLUDEPATH += $$PWD

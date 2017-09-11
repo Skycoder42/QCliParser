@@ -32,7 +32,8 @@ public:
 	void addPositionalArgument(const QString &name, const QString &description, const QString &syntax = {});
 
 private:
-	QList<std::tuple<QString, QString, QString>> _arguments;
+	typedef std::tuple<QString, QString, QString> tpl;
+	QList<tpl> _arguments;
 };
 
 class QCliContext : public QCliNode
@@ -50,7 +51,7 @@ public:
 	QSharedPointer<TNode> getNode(const QString &name) const;
 
 private:
-	QMap<QString, QPair<QString, QSharedPointer<QCliNode>>> _nodes;//TODO keep the add order!
+	QMap<QString, QPair<QString, QSharedPointer<QCliNode>>> _nodes;
 	QString _defaultNode;
 };
 
