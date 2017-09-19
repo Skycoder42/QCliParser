@@ -1,7 +1,9 @@
 #include "qclinode.h"
 
 QCliNode::QCliNode() :
-	_options()
+	_options(),
+	_keyCache(),
+	_hidden(false)
 {}
 
 QCliNode::~QCliNode() = default;
@@ -33,6 +35,17 @@ bool QCliNode::addOptions(const QList<QCommandLineOption> &options)
 	_keyCache.unite(tSet);
 	return true;
 }
+
+void QCliNode::setHidden(bool hidden)
+{
+	_hidden = hidden;
+}
+
+bool QCliNode::isHidden() const
+{
+	return _hidden;
+}
+
 
 QCliLeaf::QCliLeaf() :
 	QCliNode(),

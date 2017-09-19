@@ -18,9 +18,13 @@ public:
 	bool addOption(const QCommandLineOption &commandLineOption);
 	bool addOptions(const QList<QCommandLineOption> &options);
 
+	void setHidden(bool hidden);
+	bool isHidden() const;
+
 private:
 	QList<QCommandLineOption> _options;
 	QSet<QString> _keyCache;
+	bool _hidden;
 };
 
 class QCliLeaf : public QCliNode

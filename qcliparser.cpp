@@ -175,7 +175,12 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 
 	//create positional args
 	auto commands = context->_nodes.keys();
-	auto firstName = commands.first();
+	QStringList printArgs;
+	foreach(auto command, commands) {
+		if(!context->_nodes.value(command).second->isHidden())
+			printArgs.append(command);
+	}
+	auto firstName = printArgs.first();
 	auto pFirstName = firstName;
 	if(firstName == context->_defaultNode)
 		pFirstName = tr("%1 (default)").arg(firstName);
@@ -184,9 +189,9 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 											  (context->_defaultNode.isNull() ? QStringLiteral("%1%2%3") : QStringLiteral("%1%2[%3]"))
 											  .arg(_contextChain.join(QLatin1Char(' ')))
 											  .arg(_contextChain.isEmpty() ? QString() : QStringLiteral(" "))
-											  .arg(commands.join(QLatin1Char('|'))));
-	for(auto i = 1; i < commands.size(); i++) {
-		auto name = commands[i];
+											  .arg(printArgs.join(QLatin1Char('|'))));
+	for(auto i = 1; i < printArgs.size(); i++) {
+		auto name = printArgs[i];
 		auto pName = name;
 		if(name == context->_defaultNode)
 			pName = tr("%1 (default)").arg(name);
