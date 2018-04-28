@@ -11,6 +11,8 @@
 class QCliNode
 {
 	friend class QCliParser;
+	Q_DISABLE_COPY(QCliNode)
+
 public:
 	QCliNode();
 	virtual ~QCliNode();
@@ -36,8 +38,7 @@ public:
 	void addPositionalArgument(const QString &name, const QString &description, const QString &syntax = {});
 
 private:
-	typedef std::tuple<QString, QString, QString> tpl;
-	QList<tpl> _arguments;
+	QList<std::tuple<QString, QString, QString>> _arguments;
 };
 
 class QCliContext : public QCliNode

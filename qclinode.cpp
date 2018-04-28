@@ -54,13 +54,13 @@ QCliLeaf::QCliLeaf() :
 
 void QCliLeaf::addPositionalArgument(const QString &name, const QString &description, const QString &syntax)
 {
-	_arguments.append(tpl{
+	_arguments.append(std::make_tuple(
 						  name,
 						  description,
 						  syntax.isEmpty() ?
 							QStringLiteral("<%1>").arg(name) :
 							syntax
-					  });
+					  ));
 }
 
 QCliContext::QCliContext() :

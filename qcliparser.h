@@ -32,8 +32,8 @@ private:
 	int _readContextIndex;
 
 	//hide
-	void addPositionalArgument(const QString &name, const QString &description, const QString &syntax = QString());
-	void clearPositionalArguments();
+	Q_NORETURN void addPositionalArgument(const QString &name, const QString &description, const QString &syntax = QString());
+	Q_NORETURN void clearPositionalArguments();
 
 	void parseContext(QCliContext *context, QStringList arguments);
 	void parseLeaf(QCliLeaf *leaf, const QStringList &arguments);

@@ -100,8 +100,7 @@ bool QCliParser::parse(const QStringList &arguments)
 			_errorText = string;
 		else {
 			_errorText = tr("%1\nCommand-Context: %2")
-						 .arg(string)
-						 .arg(_contextChain.join(QStringLiteral(" -> ")));
+						 .arg(string, _contextChain.join(QStringLiteral(" -> ")));
 		}
 		return false;
 	}
@@ -187,9 +186,9 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 	QCommandLineParser::addPositionalArgument(pFirstName,
 											  context->_nodes.value(firstName).first,
 											  (context->_defaultNode.isNull() ? QStringLiteral("%1%2%3") : QStringLiteral("%1%2[%3]"))
-											  .arg(_contextChain.join(QLatin1Char(' ')))
-											  .arg(_contextChain.isEmpty() ? QString() : QStringLiteral(" "))
-											  .arg(printArgs.join(QLatin1Char('|'))));
+											  .arg(_contextChain.join(QLatin1Char(' ')),
+												   _contextChain.isEmpty() ? QString() : QStringLiteral(" "),
+												   printArgs.join(QLatin1Char('|'))));
 	for(auto i = 1; i < printArgs.size(); i++) {
 		auto name = printArgs[i];
 		auto pName = name;
@@ -246,8 +245,7 @@ void QCliParser::parseLeaf(QCliLeaf *leaf, const QStringList &arguments)
 		QCommandLineParser::addPositionalArgument(std::get<0>(first),
 												  std::get<1>(first),
 												  QStringLiteral("%1 %2")
-												  .arg(_contextChain.join(QLatin1Char(' ')))
-												  .arg(std::get<2>(first)));
+												  .arg(_contextChain.join(QLatin1Char(' ')), std::get<2>(first)));
 		for(auto i = 1; i < leaf->_arguments.size(); i++) {
 			const auto &pArg = leaf->_arguments[i];
 			QCommandLineParser::addPositionalArgument(std::get<0>(pArg), std::get<1>(pArg), std::get<2>(pArg));
