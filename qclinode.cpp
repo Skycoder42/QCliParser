@@ -10,7 +10,7 @@ QCliNode::~QCliNode() = default;
 
 bool QCliNode::addOption(const QCommandLineOption &commandLineOption)
 {
-	foreach(auto key, commandLineOption.names()) {
+	for(const auto &key : commandLineOption.names()) {
 		if(_keyCache.contains(key))
 			return false;
 	}
@@ -23,8 +23,8 @@ bool QCliNode::addOption(const QCommandLineOption &commandLineOption)
 bool QCliNode::addOptions(const QList<QCommandLineOption> &options)
 {
 	auto tSet(_keyCache);
-	foreach(auto option, options) {
-		foreach(auto key, option.names()) {
+	for(const auto &option : options) {
+		for(const auto &key : option.names()) {
 			if(tSet.contains(key))
 				return false;
 		}

@@ -175,7 +175,7 @@ void QCliParser::parseContext(QCliContext *context, QStringList arguments)
 	//create positional args
 	auto commands = context->_nodes.keys();
 	QStringList printArgs;
-	foreach(auto command, commands) {
+	for(const auto &command : commands) {
 		if(!context->_nodes.value(command).second->isHidden())
 			printArgs.append(command);
 	}
