@@ -8,7 +8,7 @@
 
 #include <tuple>
 
-class QCliNode
+class Q_CLI_PARSER_EXPORT QCliNode
 {
 	friend class QCliParser;
 	Q_DISABLE_COPY(QCliNode)
@@ -29,7 +29,7 @@ private:
 	bool _hidden;
 };
 
-class QCliLeaf : public QCliNode
+class Q_CLI_PARSER_EXPORT QCliLeaf : public QCliNode
 {
 	friend class QCliParser;
 public:
@@ -41,7 +41,7 @@ private:
 	QList<std::tuple<QString, QString, QString>> _arguments;
 };
 
-class QCliContext : public QCliNode
+class Q_CLI_PARSER_EXPORT QCliContext : public QCliNode
 {
 	friend class QCliParser;
 public:
