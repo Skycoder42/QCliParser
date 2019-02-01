@@ -11,7 +11,7 @@ An extension of QCommandlineParser to make context based CLIs easier
 ## Installation
 The package is provided via qdep, as `Skycoder42/QCliParser`. To use it simply:
 
-1. Install and enable qdep (See [qdep - Installing](https://github.com/Skycoder42/qdep#installation)
+1. Install and enable qdep (See [qdep - Installing](https://github.com/Skycoder42/qdep#installation))
 2. Add the following to your pro file:
 ```qmake
 QDEP_DEPENDS += Skycoder42/QCliParser
