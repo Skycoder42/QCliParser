@@ -1,12 +1,12 @@
 #ifndef QCLINODE_H
 #define QCLINODE_H
 
-#include <QCommandLineOption>
-#include <QMap>
-#include <QSet>
-#include <QSharedPointer>
-
 #include <tuple>
+
+#include <QtCore/QCommandLineOption>
+#include <QtCore/QMap>
+#include <QtCore/QSet>
+#include <QtCore/QSharedPointer>
 
 class Q_CLI_PARSER_EXPORT QCliNode
 {
@@ -44,6 +44,7 @@ private:
 class Q_CLI_PARSER_EXPORT QCliContext : public QCliNode
 {
 	friend class QCliParser;
+
 public:
 	QCliContext();
 

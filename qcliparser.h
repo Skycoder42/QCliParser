@@ -3,11 +3,12 @@
 
 #include "qclinode.h"
 
-#include <QCommandLineParser>
+#include <QtCore/QCommandLineParser>
 
 class Q_CLI_PARSER_EXPORT QCliParser : public QCommandLineParser, public QCliContext
 {
 	Q_DECLARE_TR_FUNCTIONS(QCliParser)
+
 public:
 	QCliParser();
 

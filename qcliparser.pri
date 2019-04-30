@@ -1,6 +1,7 @@
 HEADERS += \
 	$$PWD/qcliparser.h \
-	$$PWD/qclinode.h
+	$$PWD/qclinode.h \
+	$$PWD/qmultitree.h
 
 SOURCES += \
 	$$PWD/qcliparser.cpp \
