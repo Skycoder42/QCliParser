@@ -27,10 +27,14 @@ public:
 	QString errorText() const;
 
 private:
+	friend class QCliEvaluator;
+
 	QStringList _contextChain;
 	QString _errorText;
 
 	int _readContextIndex;
+
+	static void showParserMessage(const QString &message);
 
 	//hide
 	Q_NORETURN void addPositionalArgument(const QString &name, const QString &description, const QString &syntax = QString());

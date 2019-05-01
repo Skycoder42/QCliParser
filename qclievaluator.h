@@ -51,6 +51,8 @@ private:
 	std::optional<int> tryExec(const QMetaObject *metaObject,
 							   const QCommandLineParser &parser,
 							   const QStringList &contextList);
+	void setOptionProperties(QObject *instance, const QCommandLineParser &parser) const;
+	int callMetaMethod(QObject *instance, const QMetaMethod &method, QVariantList arguments) const;
 };
 
 template<typename TEvaluator>

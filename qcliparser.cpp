@@ -8,10 +8,12 @@
 
 extern void Q_CORE_EXPORT qt_call_post_routines();
 
+namespace {
+
 #if defined(Q_OS_WIN) && !defined(QT_BOOTSTRAPPED) && !defined(Q_OS_WINRT)
 // Return whether to use a message box. Use handles if a console can be obtained
 // or we are run with redirected handles (for example, by QProcess).
-static inline bool displayMessageBox()
+inline bool displayMessageBox()
 {
 	if (GetConsoleWindow())
 		return false;
@@ -22,13 +24,10 @@ static inline bool displayMessageBox()
 }
 #endif // Q_OS_WIN && !QT_BOOTSTRAPPED && !Q_OS_WIN && !Q_OS_WINRT
 
-static void showParserMessage(const QString &message)
+void showParserMessage(const QString &message)
 {
 #if defined(Q_OS_WINRT)
-	if (type == UsageMessage)
-		qInfo(qPrintable(message));
-	else
-		qCritical(qPrintable(message));
+	qCritical(qPrintable(message));
 	return;
 #elif defined(Q_OS_WIN) && !defined(QT_BOOTSTRAPPED)
 	if (displayMessageBox()) {
@@ -44,6 +43,8 @@ static void showParserMessage(const QString &message)
 	}
 #endif // Q_OS_WIN && !QT_BOOTSTRAPPED
 	fputs(qPrintable(message), stderr);
+}
+
 }
 
 
@@ -146,6 +147,11 @@ QStringList QCliParser::contextChain() const
 QString QCliParser::errorText() const
 {
 	return _errorText;
+}
+
+void QCliParser::showParserMessage(const QString &message)
+{
+	::showParserMessage(message);
 }
 
 void QCliParser::addPositionalArgument(const QString &name, const QString &description, const QString &syntax)
