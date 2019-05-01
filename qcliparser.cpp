@@ -64,12 +64,12 @@ void QCliParser::process(const QStringList &arguments, bool colored)
 		if(QCommandLineParser::isSet(QStringLiteral("version")))
 			showVersion();
 	} else {
-#ifndef Q_OS_WIN
+#ifdef Q_OS_WIN
+		Q_UNUSED(colored)
+#else
 		if(colored)
 			showParserMessage(QStringLiteral("\033[31m") + errorText() + QStringLiteral("\033[0m\n"));
 		else
-#else
-		Q_UNUSED(colored)
 #endif
 			showParserMessage(errorText() + QLatin1Char('\n'));
 		qt_call_post_routines();

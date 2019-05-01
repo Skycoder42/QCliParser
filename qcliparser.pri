@@ -1,9 +1,11 @@
 HEADERS += \
+	$$PWD/qclievaluator.h \
 	$$PWD/qcliparser.h \
 	$$PWD/qclinode.h \
 	$$PWD/qmultitree.h
 
 SOURCES += \
+	$$PWD/qclievaluator.cpp \
 	$$PWD/qcliparser.cpp \
 	$$PWD/qclinode.cpp
 

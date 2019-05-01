@@ -34,7 +34,7 @@ public:
 		}
 
 		bool hasValue() const {
-			return _value;
+			return _value.has_value();
 		}
 		TValue value() const {
 			return _value.value_or(TValue{});
