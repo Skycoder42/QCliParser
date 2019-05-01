@@ -39,6 +39,11 @@ protected:
 	virtual QByteArray evaluatorMethodName(const QMetaObject *metaObject, const QStringList &contextList) const;
 
 private:
+	struct LogBlocker {
+		LogBlocker();
+		~LogBlocker();
+	};
+
 	using EvaluatorTree = QMultiTree<QString, const QMetaObject *>;
 
 	bool _autoResolveObjects = true;

@@ -13,11 +13,27 @@ constexpr auto LogScope = QtDebugMsg;
 
 Q_LOGGING_CATEGORY(cliEval, "QCliEvaluator", LogScope)
 
+auto logFilterEnabled = false;
+QLoggingCategory::CategoryFilter oldCategoryFilter = nullptr;
+QLoggingCategory *dCat = nullptr;
+
+void cliLogFilter(QLoggingCategory *category)
+{
+	oldCategoryFilter(category);
+	if (qstrcmp(category->categoryName(), "default") == 0) {
+		dCat = category;
+		category->setEnabled(QtWarningMsg, !logFilterEnabled);
+	}
+}
+
 }
 
 QCliEvaluator::QCliEvaluator(QObject *parent) :
 	QObject{parent}
-{}
+{
+	if (!oldCategoryFilter)
+		oldCategoryFilter = QLoggingCategory::installFilter(cliLogFilter);
+}
 
 bool QCliEvaluator::doesAutoResolveObjects() const
 {
@@ -221,7 +237,13 @@ void QCliEvaluator::setOptionProperties(QObject *instance, const QCommandLinePar
 			continue;
 		// is set -> update property
 		const auto pName = QString::fromUtf8(property.name());
-		if(parser.isSet(pName)) {
+
+		auto isSet = false;
+		{
+			LogBlocker blocker;
+			isSet = parser.isSet(pName);
+		}
+		if(isSet) {
 			switch (property.userType()) {
 			case QMetaType::Bool:
 				property.write(instance, true);
@@ -276,4 +298,20 @@ int QCliEvaluator::callMetaMethod(QObject *instance, const QMetaMethod &method, 
 							<< "on instance" << instance;
 		return EXIT_FAILURE;
 	}
+}
+
+
+
+QCliEvaluator::LogBlocker::LogBlocker()
+{
+	logFilterEnabled = true;
+	if (dCat)
+		dCat->setEnabled(QtWarningMsg, false);
+}
+
+QCliEvaluator::LogBlocker::~LogBlocker()
+{
+	logFilterEnabled = false;
+	if (dCat)
+		dCat->setEnabled(QtWarningMsg, true);
 }
