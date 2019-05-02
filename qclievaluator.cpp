@@ -236,7 +236,7 @@ void QCliEvaluator::setOptionProperties(QObject *instance, const QCommandLinePar
 		if (!property.isWritable())
 			continue;
 		// is set -> update property
-		const auto pName = QString::fromUtf8(property.name());
+		const auto pName = QString::fromUtf8(property.name()).replace(QLatin1Char('_'), QLatin1Char('-'));
 
 		auto isSet = false;
 		{
