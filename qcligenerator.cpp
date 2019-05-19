@@ -44,3 +44,19 @@ int QCliGenerator::exec(QCommandLineParser &parser)
 QCliOrchestrator::QCliOrchestrator() = default;
 
 QCliOrchestrator::~QCliOrchestrator() = default;
+
+
+
+QCliMetaOrchestrator::QCliMetaOrchestrator(QObject *parent) :
+	QObject{parent}
+{}
+
+QList<QPair<QString, QString>> QCliMetaOrchestrator::contextList(const QStringList &prefix) const
+{
+
+}
+
+const QObject *QCliMetaOrchestrator::createGenerator(const QStringList &context, QObject *parent)
+{
+
+}

@@ -4,58 +4,97 @@
 #include <optional>
 
 #include <QtCore/QHash>
-#include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QWeakPointer>
 
 template <typename TKey, typename TValue>
 class QMultiTree
 {
 public:
 	class Node {
+	private:
+		struct Data {
+			inline Data(QWeakPointer<Data> parent = {}) :
+				parent{parent}
+			{}
+			inline Data(const Data &) = default;
+			inline Data(Data &&) noexcept = default;
+
+			QWeakPointer<Data> parent;
+			QHash<TKey, QSharedPointer<Data>> children;
+			std::optional<TValue> value;
+		};
+
 	public:
-		Node(const Node &other) = delete;
-		Node &operator=(const Node &other) = delete;
+		Node() :
+			d{QSharedPointer<Data>::create()}
+		{}
+
+		Node(const Node &other) = default;
+		Node &operator=(const Node &other) = default;
 		Node(Node &&other) noexcept = default;
 		Node &operator=(Node &&other) noexcept = default;
-		~Node() {
-			for (auto child : qAsConst(_children))
-				delete child;
+		~Node() = default;
+
+		explicit operator bool() const {
+			return d->parent;
+		}
+		bool operator!() const {
+			return !d->parent;
 		}
 
-		Node *child(const TKey &key) {
-			if (!_children.contains(key))
-				_children.insert(key, new Node{this});
-			return _children[key];
+		Node child(const TKey &key) {
+			auto dIter = d->children.find(key);
+			if (dIter == d->children.end())
+				dIter = d->children.insert(key, QSharedPointer<Data>::create(d.toWeakRef()));
+			return *dIter;
 		}
-		Node *child(const TKey &key) const {
-			return _children.value(key, nullptr);
+		Node child(const TKey &key) const {
+			return d->children.value(key, {});
 		}
-		Node *find(const QList<TKey> &keys) {
+		Node find(const QList<TKey> &keys) {
 			return find(keys, 0);
 		}
 
 		bool hasValue() const {
-			return _value.has_value();
+			return d->value.has_value();
 		}
 		TValue value() const {
-			return _value.value_or(TValue{});
+			return d->value.value_or(TValue{});
 		}
 		TValue &value() {
-			return _value.value();
+			if (!d->value)
+				return d->value.emplace();
+			else
+				return d->value.value();
 		}
 		void setValue(TValue value) {
-			_value = std::move(value);
+			d->value = std::move(value);
+		}
+		TValue takeValue() {
+			if (d->value) {
+				auto tValue = std::move(std::move(d->value).value()).value();
+				d->value = std::nullopt;
+				return tValue;
+			} else
+				return {};
+		}
+		void removeValue() {
+			d->value = std::nullopt;
 		}
 
 		int depth() const {
-			return _parent ? _parent->depth() + 1 : 0;
+			const auto parent = d->parent.toStrongRef();
+			return parent ? parent->depth() + 1 : 0;
 		}
 		QList<TKey> key() const {
-			if (!_parent)
+			const auto parent = d->parent.toStrongRef();
+			if (!parent)
 				return {};
 
-			for (auto it = _children.begin(); it != _children.end(); ++it) {
-				if (*it == this) {
-					auto keyChain = _parent->key();
+			for (auto it = d->children.begin(); it != d->children.end(); ++it) {
+				if (*it == d) {
+					auto keyChain = parent->key();
 					keyChain.append(it.key());
 					return keyChain;
 				}
@@ -63,36 +102,35 @@ public:
 
 			return {};
 		}
-		Node *parent() const {
-			return _parent;
+		Node parent() const {
+			const auto parent = d->parent.toStrongRef();
+			return parent ? Node{parent} : Node{};
 		}
 
 		Node *clone() const {
-			auto cNode = new Node{nullptr};
-			cNode->_value = _value;
-			for (auto it = _children.begin(); it != _children.end(); ++it) {
-				auto cChild = it->clone();
-				cChild->_parent = cNode;
-				cNode->_children.insert(it.key(), cChild);
+			Node cNode;
+			cNode.d->value = d->value;
+			for (auto it = d->children.begin(); it != d->children.end(); ++it) {
+				// TODO add cloneImpl function to avoid temporary node construction
+				auto cChild = Node{*it}.clone().d;
+				cChild->parent = cNode.d;
+				cNode.d->children.insert(it.key(), cChild);
 			}
 			return cNode;
 		}
-
 	private:
 		friend class QMultiTree;
-		Node *_parent;
-		QHash<TKey, Node*> _children;
-		std::optional<TValue> _value;
+		QSharedPointer<Data> d;
 
-		Node(Node *parent = nullptr) :
-			_parent{parent}
+		inline Node(QSharedPointer<Data> data) :
+			d{std::move(data)}
 		{}
 
-		Node *find(const QList<TKey> &keys, int index) {
+		Node find(const QList<TKey> &keys, int index) {
 			if (index == keys.size())
-				return this;
-			else
-				return child(keys[index])->find(keys, index + 1);
+				return *this;
+			else // TODO optimize
+				return child(keys[index]).find(keys, index + 1);
 		}
 	};
 

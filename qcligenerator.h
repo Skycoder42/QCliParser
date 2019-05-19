@@ -6,7 +6,7 @@
 
 #include "qcligenerator_meta.h"
 
-class QCliOrchestrator
+class Q_CLI_PARSER_EXPORT QCliOrchestrator
 {
 	Q_DISABLE_COPY(QCliOrchestrator)
 public:
@@ -17,7 +17,22 @@ public:
 	virtual const QObject *createGenerator(const QStringList &context, QObject *parent) = 0;
 };
 
-class QCliGenerator : public QObject
+class Q_CLI_PARSER_EXPORT QCliMetaOrchestrator : public QObject, public QCliOrchestrator
+{
+	Q_OBJECT
+	Q_INTERFACES(QCliMetaOrchestrator)
+
+public:
+	QCliMetaOrchestrator(QObject *parent = nullptr);
+
+	QList<QPair<QString, QString> > contextList(const QStringList &prefix) const override;
+	const QObject *createGenerator(const QStringList &context, QObject *parent) override;
+
+private:
+
+};
+
+class Q_CLI_PARSER_EXPORT QCliGenerator : public QObject
 {
 	Q_OBJECT
 
