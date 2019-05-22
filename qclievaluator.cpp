@@ -63,8 +63,7 @@ bool QCliEvaluator::registerEvaluator(const QMetaObject *metaObject, const QStri
 	if (!metaObject->inherits(&QObject::staticMetaObject))
 		return false;
 
-	auto evalNode = _evaluators.find(path);
-	evalNode->setValue(metaObject);
+	_evaluators[path] = metaObject; // TODO fails
 	return true;
 }
 
@@ -104,12 +103,12 @@ const QMetaObject *QCliEvaluator::metaObjectForName(const QByteArray &className)
 int QCliEvaluator::execImpl(const QCommandLineParser &parser, const QStringList &contextList)
 {
 	// find the evaluator node chain
-	auto pNode = _evaluators.find(contextList);
+	auto pNode = _evaluators[contextList];
 	do {
-		const auto depth = pNode->depth();
+		const auto depth = pNode.depth();
 		// first: check if explicit evaluator was set
-		if (pNode->hasValue()) {
-			const auto res = tryExec(pNode->value(), parser, contextList.mid(depth));
+		if (pNode.hasValue()) {
+			const auto res = tryExec(*pNode, parser, contextList.mid(depth));
 			if (res)
 				return res.value();
 		}
@@ -123,7 +122,7 @@ int QCliEvaluator::execImpl(const QCommandLineParser &parser, const QStringList 
 					return res.value();
 			}
 		}
-	} while((pNode = pNode->parent()));
+	} while((pNode = pNode.parent()));
 	// no evaluator found...
 	qCCritical(cliEval) << "Unable to find any evaluators capable of executing" << contextList;
 	return EXIT_FAILURE;

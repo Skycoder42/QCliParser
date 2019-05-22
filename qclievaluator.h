@@ -2,11 +2,12 @@
 #define QCLIEVALUATOR_H
 
 #include "qcliparser.h"
-#include "qmultitree.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QVariant>
+
+#include <qunorderedtree.h>
 
 class Q_CLI_PARSER_EXPORT QCliEvaluator : public QObject
 {
@@ -44,7 +45,7 @@ private:
 		~LogBlocker();
 	};
 
-	using EvaluatorTree = QMultiTree<QString, const QMetaObject *>;
+	using EvaluatorTree = QUnorderedTree<QString, const QMetaObject *>;
 
 	bool _autoResolveObjects = true;
 

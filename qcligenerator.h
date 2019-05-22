@@ -17,10 +17,13 @@ public:
 	virtual const QObject *createGenerator(const QStringList &context, QObject *parent) = 0;
 };
 
+#define QCliOrchestratorIid "de.skycoder42.qcliparser.QCliOrchestrator"
+Q_DECLARE_INTERFACE(QCliOrchestrator, QCliOrchestratorIid)
+
 class Q_CLI_PARSER_EXPORT QCliMetaOrchestrator : public QObject, public QCliOrchestrator
 {
 	Q_OBJECT
-	Q_INTERFACES(QCliMetaOrchestrator)
+	Q_INTERFACES(QCliOrchestrator)
 
 public:
 	QCliMetaOrchestrator(QObject *parent = nullptr);
@@ -54,8 +57,5 @@ public:
 	Q_INVOKABLE int exec(QCliParser &parser);
 	Q_INVOKABLE int exec(QCommandLineParser &parser);
 };
-
-#define QCliOrchestratorIid "de.skycoder42.qcliparser.QCliOrchestrator"
-Q_DECLARE_INTERFACE(QCliOrchestrator, QCliOrchestratorIid)
 
 #endif // QCLIGENERATOR_H

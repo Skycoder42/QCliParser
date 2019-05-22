@@ -12,3 +12,5 @@ TARGET = generator-demo
 include(../../qcliparser.pri)
 
 SOURCES += main.cpp
+
+!load(qdep):error("Failed to load qdep feature! Run 'qdep.py prfgen --qmake $$QMAKE_QMAKE' to create it.")
